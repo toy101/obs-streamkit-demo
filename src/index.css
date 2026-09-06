@@ -1,0 +1,234 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
+}
+
+/*
+ * スケールの基準
+ *
+ * Overlay のサイズ・位置に関する指定（font-size / width / height / padding /
+ * border / top / left など）は、すべて rem で書く。1rem = 64px とみなすと、
+ * 1920 x 1080 のキャンバスをそのままの数値で設計できる（OBS 実寸 ÷ 64 = rem 値）。
+ *
+ * キャンバスを描画するドキュメント（?view=overlay と ?view=debug）にだけ
+ * main.tsx が html へ .is-canvas を付け、root の font-size を 64px に上げる。
+ * これで OBS でもデバッグ画面でも Overlay は常に同じ実寸で組まれる。
+ *
+ * ドックや額縁は「等倍で描画される UI」なので、既定の 16px 側に置いて px で書く。
+ */
+
+html {
+  font-size: 16px;
+}
+
+html.is-canvas {
+  font-size: 64px;
+}
+
+/*
+ * Dock
+ *
+ * ドックは配信画面ではなく OBS の UI パネルなので、1920 x 1080 のキャンバスとは
+ * 無関係に等倍で描画させたい。ここは意図的に px のままにする。
+ * font-size の明示は、?view=debug（root が 64px）に埋め込まれたときの保険。
+ */
+
+.dock {
+  min-height: 100%;
+  padding: 20px;
+
+  background: #18181b;
+  color: white;
+
+  font-size: 16px;
+}
+
+.dock h1 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.dock label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.dock select {
+  padding: 8px;
+
+  font-size: 16px;
+}
+
+/*
+ * Overlay
+ *
+ * 数値の横のコメントは 1rem = 64px（OBS 実寸）に換算した値。
+ */
+
+.overlay {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: transparent;
+
+  color: white;
+}
+
+.overlay-content {
+  padding: 0.625rem 1.25rem; /* 40px 80px */
+
+  text-align: center;
+
+  background: rgb(0 0 0 / 80%);
+
+  border-radius: 0.375rem; /* 24px */
+}
+
+.overlay-content h1 {
+  margin: 0;
+
+  font-size: 1.125rem; /* 72px */
+}
+
+.overlay-content p {
+  margin-bottom: 0;
+
+  font-size: 0.4375rem; /* 28px */
+}
+
+.overlay-waiting .overlay-content {
+  border: 0.0625rem solid #60a5fa; /* 4px */
+}
+
+.overlay-match .overlay-content {
+  border: 0.0625rem solid #f87171; /* 4px */
+}
+
+.overlay-break .overlay-content {
+  border: 0.0625rem solid #facc15; /* 4px */
+}
+
+/*
+ * Debug
+ *
+ * Dock と Overlay を 1 ウィンドウに並べて、OBS を起動せずに確認するための画面。
+ * ステージは 1920 x 1080 の実寸のまま組み、画面に収めるための縮小は
+ * transform: scale() で見た目にだけ掛ける。レイアウトは常に実寸で計算されるので、
+ * DevTools で覗く数値も OBS 上の数値と一致する。
+ *
+ * ここは Overlay の外側の額縁なので px で書く。
+ */
+
+.debug {
+  height: 100%;
+  padding: 24px;
+
+  display: flex;
+
+  gap: 24px;
+
+  overflow: hidden;
+
+  background: #09090b;
+  color: white;
+
+  /* root が 64px なので、px 側の既定サイズを明示しておく */
+  font-size: 14px;
+}
+
+.debug-dock {
+  width: 320px;
+  flex: none;
+
+  overflow: auto;
+
+  border-radius: 12px;
+}
+
+.debug-preview {
+  flex: 1;
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.debug-preview-label {
+  margin: 0;
+
+  font-size: 12px;
+  color: #a1a1aa;
+}
+
+/*
+ * 空きスペース。ここのサイズを測って縮小率を決めるので、ステージ側は絶対配置で
+ * フローから外し、縮小結果がこの計測に跳ね返らないようにする。
+ */
+
+.debug-viewport {
+  flex: 1;
+  min-height: 0;
+
+  position: relative;
+  overflow: hidden;
+}
+
+.debug-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 1920px;
+  height: 1080px;
+
+  transform-origin: top left;
+
+  /* .overlay が transparent であることを確認するための市松模様 */
+  background-color: #27272a;
+  background-image:
+    linear-gradient(
+      45deg,
+      #3f3f46 25%,
+      transparent 25%,
+      transparent 75%,
+      #3f3f46 75%
+    ),
+    linear-gradient(
+      45deg,
+      #3f3f46 25%,
+      transparent 25%,
+      transparent 75%,
+      #3f3f46 75%
+    );
+  background-position:
+    0 0,
+    24px 24px;
+  background-size: 48px 48px;
+
+  /* transform で一緒に縮むぶん、太めにしておく */
+  outline: 2px solid #3f3f46;
+}

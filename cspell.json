@@ -1,0 +1,13 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "useGitignore": true,
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "pnpm-lock.yaml",
+    ".omc/**",
+    "**/*.svg"
+  ],
+  "words": ["streamkit", "vite"]
+}
